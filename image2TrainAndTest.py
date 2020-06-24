@@ -2,10 +2,10 @@
 import numpy as np
 from PIL import Image
 import glob
-from chainer.datasets import tuple_dataset
+from chainer.datasets import TupleDataset
 import cv2
 
-def image2TrainAndTest(pathsAndLabels, size=128, channels=1):
+def image2TrainAndTest(pathsAndLabels, size=224, channels=1):
 
     allData = []
     for pathAndLabel in pathsAndLabels:
@@ -26,8 +26,8 @@ def image2TrainAndTest(pathsAndLabels, size=128, channels=1):
             labelData.append(np.int32(pathAndLabel[1]))
             
         threshold = np.int32(len(imageData)/8*7)
-        train = tuple_dataset.TupleDataset(imageData[0:threshold], labelData[0:threshold])
-        test = tuple_dataset.TupleDataset(imageData[threshold:], labelData[threshold:])
+        train = TupleDataset(imageData[0:threshold], labelData[0:threshold])
+        test = TupleDataset(imageData[threshold:], labelData[threshold:])
     else:
         imageData = []
         labelData = []
@@ -35,25 +35,17 @@ def image2TrainAndTest(pathsAndLabels, size=128, channels=1):
             img = Image.open(pathAndLabel[0])
             # img = cv2.imread(pathAndLabel[0])
             img = img.resize((size, size))
-            # print(np.array(img).shape)
-            # img = cv2.resize(img, (size, size))
-            # print(img.shape)
-            # img = img.tolist()
             r,g,b = img.split()
             rImgData = np.asarray(np.float32(r)/255.0)
             gImgData = np.asarray(np.float32(g)/255.0)
             bImgData = np.asarray(np.float32(b)/255.0)
             imgData = np.asarray([rImgData, gImgData, bImgData])
-            print(imgData.shape)
             imageData.append(imgData)
             labelData.append(np.int32(pathAndLabel[1]))
 
         threshold = np.int32(len(imageData)/8*7)
-        print(threshold)
-        train = tuple_dataset.TupleDataset(imageData[0:threshold], labelData[0:threshold])
-        print(train)
-        test  = tuple_dataset.TupleDataset(imageData[threshold:],  labelData[threshold:])
-        print(test)
+        train = TupleDataset(imageData[0:threshold], labelData[0:threshold])
+        test  = TupleDataset(imageData[threshold:],  labelData[threshold:])
 
     return train, test
 
