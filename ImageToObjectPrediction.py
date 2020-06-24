@@ -14,6 +14,7 @@ import sys
 # Import RTM module
 import RTC
 import OpenRTM_aist
+import network
 
 
 # Import Service implementation class
@@ -47,8 +48,8 @@ imagetoobjectprediction_spec = [
     "max_instance", "1",
     "language", "Python",
     "lang_type", "SCRIPT",
-    "conf.default.model", "googlenet.model",
-    "conf.default.labels", "labels.txt",
+    "conf.default.model", "test_output_2.model", # 変更
+    "conf.default.labels", "test.txt", # 変更
     "conf.default.decision_rate", "0.3",
     "conf.default.decision_count", "2",
     "conf.default.display_num", "10",
@@ -99,13 +100,13 @@ class ImageToObjectPrediction(OpenRTM_aist.DataFlowComponentBase):
          - Name:  model
          - DefaultValue: googlenet.model
         """
-        self._model = ['googlenet.model']
+        self._model = ['test_output_2.model'] # 変更
         """
 
          - Name:  labels
          - DefaultValue: labels.txt
         """
-        self._labels = ['labels.txt']
+        self._labels = ['text.txt'] # 変更
         """
 
          - Name:  decision_rate
@@ -127,7 +128,7 @@ class ImageToObjectPrediction(OpenRTM_aist.DataFlowComponentBase):
 
         # </rtc-template>
 
-        self._net_model = GoogLeNet()
+        self._net_model = network.GoogLeNet() # 変更
         self._log = OpenRTM_aist.Manager.instance().getLogbuf("ImageToObjectPrediction")
         self._previous_object = ""
         self._match_count = 0
@@ -142,8 +143,8 @@ class ImageToObjectPrediction(OpenRTM_aist.DataFlowComponentBase):
     #
     def onInitialize(self):
         # Bind variables and configuration variable
-        self.bindParameter("model", self._model, "googlenet.model")
-        self.bindParameter("labels", self._labels, "labels.txt")
+        self.bindParameter("model", self._model, "test_output_2.model") # 変更
+        self.bindParameter("labels", self._labels, "test.txt") # 変更
         self.bindParameter("decision_rate", self._decision_rate, "0.3")
         self.bindParameter("decision_count", self._decision_count, "2")
         self.bindParameter("display_num", self._display_num, "10")
@@ -217,7 +218,7 @@ class ImageToObjectPrediction(OpenRTM_aist.DataFlowComponentBase):
 
         self._previous_object = ""
         self._match_count = 0
-        serializers.load_npz(self._model[0], self._net_model)
+        serializers.load_npz(self._model[0], self._net_model, strict=False) # 変更
 
         return RTC.RTC_OK
 
