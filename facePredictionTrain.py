@@ -8,6 +8,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from PIL import Image
 import glob
+import sys
 
 import pickle
 import chainer
@@ -29,7 +30,7 @@ def main():
     parse.add_argument('--gpu','-g',type=int, default=-1,
                        help='GPU ID(negative value indicates CPU')
     parse.add_argument('--path','-p', default='')
-    parse.add_argument('--network','-n',type=str, default="googlenet",
+    parse.add_argument('--network','-n',type=str, default="GoogLeNet",
                        help='choise network')
 
     args = parse.parse_args()
@@ -60,20 +61,22 @@ def main():
     valid_iter = iterators.SerialIterator(valid, bathchsize, shuffle=False, repeat=False)
 
     # ネットワークを作成
-    if args.network is "googlenet":
+    print(type(args.network))
+    if args.network == "GoogLeNet":
         print("使用するネットワーク : {}".format(args.network))
-        predictor = network.GoogLeNet()
-    elif args.network is "MLP":
+        predictor = network.GoogLeNet(n_out=len(pathsAndLabels))
+    elif args.network == "MLP":
         print("使用するネットワーク : {}".format(args.network))
-        predictor = network.MLP()
+        predictor = network.MLP(n_out=len(pathsAndLabels))
     else:
-        print("Please choise network")
-        raise err
+        print("***** Please choise network !!! *****")
+        sys.exit()
 
     # GPUかどうか
     if args.gpu >= 0:
         chainer.cuda.get_device(args.gpu).use()  # Make a specified GPU current
         model.to_gpu()  # Copy the model to the GPU
+
     # L.Classifier でラップし、損失の計算などをモデルに含める
     net = L.Classifier(predictor)
 
@@ -86,7 +89,6 @@ def main():
     trainer = training.Trainer(updater, (args.epoch, 'epoch'), out='result_test')
 
     trainer.extend(extensions.LogReport(trigger=(1, 'epoch'), log_name='log'))
-    # trainer.extend(extensions.snapshot(filename='snapshot_epoch-{.updater.epoch}'))
     trainer.extend(extensions.dump_graph('main/loss'))
     trainer.extend(extensions.Evaluator(valid_iter, net, device=args.gpu), name='val')
     trainer.extend(extensions.PrintReport(['epoch', 'iteration', 'main/loss', 'main/accuracy', 'val/main/loss', 'val/main/accuracy', 'elapsed_time']))

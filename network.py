@@ -42,7 +42,7 @@ class GoogLeNet(chainer.Chain):
 
     insize = 224
 
-    def __init__(self):
+    def __init__(self, n_out=4):
         super(GoogLeNet, self).__init__(
             conv1=L.Convolution2D(3,  64, 7, stride=2, pad=3),
             conv2_reduce=L.Convolution2D(64,  64, 1),
@@ -56,15 +56,15 @@ class GoogLeNet(chainer.Chain):
             inc4e=L.Inception(528, 256, 160, 320, 32, 128, 128),
             inc5a=L.Inception(832, 256, 160, 320, 32, 128, 128),
             inc5b=L.Inception(832, 384, 192, 384, 48, 128, 128),
-            loss3_fc=L.Linear(1024, 2), # 出力によってかえる
+            loss3_fc=L.Linear(1024, n_out), # 出力によってかえる
 
             loss1_conv=L.Convolution2D(512, 128, 1),
             loss1_fc1=L.Linear(2048, 1024),
-            loss1_fc2=L.Linear(1024, 2), # 出力によってかえる
+            loss1_fc2=L.Linear(1024, n_out), # 出力によってかえる
 
             loss2_conv=L.Convolution2D(528, 128, 1),
             loss2_fc1=L.Linear(2048, 1024),
-            loss2_fc2=L.Linear(1024, 2) # 出力によってかえる
+            loss2_fc2=L.Linear(1024, n_out) # 出力によってかえる
         )
         self.train = True
 
@@ -108,7 +108,7 @@ class GoogLeNet(chainer.Chain):
 
 class MLP(chainer.Chain):
 
-    def __init__(self, n_mid_units=100, n_out=2):
+    def __init__(self, n_mid_units=100, n_out=4):
         super().__init__()
 
         with self.init_scope():
