@@ -1,0 +1,13 @@
+{
+	"folders": [
+		{
+			"name": "Face-to-Emoji",
+			"path": "."
+		},
+		{
+			"name": "lib",
+			"path": "../../../../Downloads/face_prediction-master/lib"
+		}
+	],
+	"settings": {}
+}

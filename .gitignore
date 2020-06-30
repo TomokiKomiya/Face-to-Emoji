@@ -5,3 +5,6 @@ result/
 result_google/
 result_test/
 data/*.jpg/
+image/
+result_face_10/
+result_face_100/

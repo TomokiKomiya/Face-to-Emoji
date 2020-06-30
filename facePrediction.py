@@ -32,9 +32,9 @@ def main():
     parse = argparse.ArgumentParser(description='face detection')
     parse.add_argument('--gpu','-g',type=int, default=-1,
                     help='GPU ID(negative value indicates CPU')
-    parse.add_argument('--model','-m', default='test_output_2.model')
+    parse.add_argument('--model','-m', default='GoogLeNet_output_100_4.model')
     parse.add_argument('--size', '-s', type=int, default=224)
-    parse.add_argument('--testpath', '-p', default="./data/test/2.jpg")
+    parse.add_argument('--testpath', '-p', default="./data/test/IMG_7945.jpg")
     args = parse.parse_args()
 
     if args.model == '':
@@ -46,13 +46,13 @@ def main():
     outnum = int(outNumStr[ len(outNumStr)-1 ])
 
     # ネットワークを作成
-    predictor = network.GoogLeNet()
+    predictor = network.MLP()
     print("今回使用する学習済みモデル : {}".format(args.model))
 
     chainer.serializers.load_npz(args.model, predictor, strict=False)
 
     ident = [""] * outnum
-    for line in open("test.txt", "r"):
+    for line in open("face.txt", "r"):
         dirname = line.split(",")[0]
         label = line.split(",")[1]
         ident[int(label)] = dirname

@@ -38,7 +38,7 @@ def main():
     pathsAndLabels = []
     label_i = 0
     data_list = glob.glob(args.path + "*")
-    datatxt = open("test.txt","w")
+    datatxt = open("face.txt","w")
     for datafinderName in data_list:
         pathsAndLabels.append(np.asarray([datafinderName+"/", label_i]))
         pattern = r".*/(.*)"
@@ -86,7 +86,7 @@ def main():
     # アップデータにイテレータとオプティマイザを渡す
     updater = training.StandardUpdater(train_iter, optimizer, device=args.gpu) # device=-1でCPUでの計算実行を指定
 
-    trainer = training.Trainer(updater, (args.epoch, 'epoch'), out='result_test')
+    trainer = training.Trainer(updater, (args.epoch, 'epoch'), out='result_face_10')
 
     trainer.extend(extensions.LogReport(trigger=(1, 'epoch'), log_name='log'))
     trainer.extend(extensions.dump_graph('main/loss'))
@@ -99,7 +99,7 @@ def main():
 
     trainer.run()
 
-    outputname = args.network + "_output_" + str(len(pathsAndLabels))
+    outputname = args.network + "_output_10_" + str(len(pathsAndLabels))
     modelOutName = outputname + ".model"
     OptimOutName = outputname + ".state"
 

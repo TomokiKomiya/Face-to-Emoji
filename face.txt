@@ -1,0 +1,4 @@
+sad,0
+angry,1
+normal,2
+smile,3

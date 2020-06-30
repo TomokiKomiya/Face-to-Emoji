@@ -40,6 +40,7 @@ def image2TrainAndTest(pathsAndLabels, size=224, channels=1):
             gImgData = np.asarray(np.float32(g)/255.0)
             bImgData = np.asarray(np.float32(b)/255.0)
             imgData = np.asarray([rImgData, gImgData, bImgData])
+            # imgData = cv2.cvtColor(imgData, cv2.COLOR_RGB2BGR)
             imageData.append(imgData)
             labelData.append(np.int32(pathAndLabel[1]))
 
