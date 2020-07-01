@@ -48,8 +48,8 @@ imagetoobjectprediction_spec = [
     "max_instance", "1",
     "language", "Python",
     "lang_type", "SCRIPT",
-    "conf.default.model", "test_output_2.model", # 変更
-    "conf.default.labels", "test.txt", # 変更
+    "conf.default.model", "GoogLeNet_output2_3.model", # 変更
+    "conf.default.labels", "face_cat_dog.txt", # 変更
     "conf.default.decision_rate", "0.3",
     "conf.default.decision_count", "2",
     "conf.default.display_num", "10",
@@ -100,13 +100,13 @@ class ImageToObjectPrediction(OpenRTM_aist.DataFlowComponentBase):
          - Name:  model
          - DefaultValue: googlenet.model
         """
-        self._model = ['test_output_2.model'] # 変更
+        self._model = ['GoogLeNet_output2_3.model'] # 変更
         """
 
          - Name:  labels
          - DefaultValue: labels.txt
         """
-        self._labels = ['text.txt'] # 変更
+        self._labels = ['face_cat_dog.txt'] # 変更
         """
 
          - Name:  decision_rate
@@ -118,7 +118,7 @@ class ImageToObjectPrediction(OpenRTM_aist.DataFlowComponentBase):
          - Name:  decision_count
          - DefaultValue: 2
         """
-        self._decision_count = [2]
+        self._decision_count = [3]
         """
 
          - Name:  display_num
@@ -143,10 +143,10 @@ class ImageToObjectPrediction(OpenRTM_aist.DataFlowComponentBase):
     #
     def onInitialize(self):
         # Bind variables and configuration variable
-        self.bindParameter("model", self._model, "test_output_2.model") # 変更
-        self.bindParameter("labels", self._labels, "test.txt") # 変更
+        self.bindParameter("model", self._model, "GoogLeNet_output2_3.model") # 変更
+        self.bindParameter("labels", self._labels, "face_cat_dog.txt") # 変更
         self.bindParameter("decision_rate", self._decision_rate, "0.3")
-        self.bindParameter("decision_count", self._decision_count, "2")
+        self.bindParameter("decision_count", self._decision_count, "3")
         self.bindParameter("display_num", self._display_num, "10")
 
         # Set InPort buffers
@@ -272,19 +272,36 @@ class ImageToObjectPrediction(OpenRTM_aist.DataFlowComponentBase):
         prediction = F.softmax(y)
         categories = np.loadtxt(self._labels[0], delimiter="\n", dtype=str)
         result = zip(prediction.data.reshape((prediction.data.size,)), categories)
+        print("=================")
         result = sorted(result, reverse=True)
+        print(result)
         for i, (score, label) in enumerate(result[:self._display_num[0]]):
             self._log.RTC_DEBUG('{:>3d} {:>6.2f}% {}'.format(i + 1, score * 100, label))
 
         if result[0][0] > float(self._decision_rate[0]):
-            if result[0][1] == self._previous_object:
-                self._match_count += 1
-                if self._match_count >= int(self._decision_count[0]):
-                    self._d_out_name.data = result[0][1]
-                    self._out_nameOut.write()
-                    self._log.RTC_INFO("Recognized Object: " + str(self._d_out_name.data))
+            self._d_out_name.data = result[0][1]
+            print("Is this " + str(self._d_out_name.data) + " ?")
+            ans = input()
+            if ans == "y":
+                self._d_out_name.data = result[0][1]
+                self._out_nameOut.write()
+                self._log.RTC_INFO("Recognized Object: " + str(self._d_out_name.data))
+            elif ans == "cat":
+                self._d_out_name.data = "cat,0"
+                self._out_nameOut.write()
+                self._log.RTC_INFO("Recognized Object: " + str(self._d_out_name.data))
+            elif ans == "normal":
+                self._d_out_name.data = "normal,2"
+                self._out_nameOut.write()
+                self._log.RTC_INFO("Recognized Object: " + str(self._d_out_name.data))
+            elif ans == "dog":
+                self._d_out_name.data = "dog,1"
+                self._out_nameOut.write()
+                self._log.RTC_INFO("Recognized Object: " + str(self._d_out_name.data))
             else:
-                self._match_count = 0
+                self._d_out_name.data = "stop"
+                self._out_nameOut.write()
+
 
             self._previous_object = result[0][1]
 
